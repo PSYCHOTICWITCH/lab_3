@@ -1,35 +1,15 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Numerics;
+using System.Runtime.InteropServices.Marshalling;
 using System.Text;
 using System.Threading.Tasks;
 using System.Xml.Serialization;
+using static System.Runtime.InteropServices.JavaScript.JSType;
 
 namespace lab_3
 {
-    public struct Toy
-    {
-        public string Name;
-        public int Price;
-        public int minAge;
-        public int maxAge;
-
-        public Toy(string name, int price, int min_age, int max_age)
-        {
-            if (string.IsNullOrWhiteSpace(name))
-                throw new ArgumentException("Имя обязательно", nameof(name));
-            if (price < 0)
-                throw new ArgumentOutOfRangeException(nameof(price));
-            if (min_age < 0)
-                throw new ArgumentOutOfRangeException(nameof(min_age));
-            if (max_age < 0 && max_age < min_age)
-                throw new ArgumentOutOfRangeException(nameof(max_age));
-            Name = name;
-            Price = price;
-            minAge = min_age;
-            maxAge = max_age;
-        }
-    }
     internal class FileClass
     {
         public static void WriteBinary(string path)
@@ -115,6 +95,17 @@ namespace lab_3
             Console.Write("\n");
         }
 
+        public static void ShowFileStrings(string path)
+        {
+            string[] lines = File.ReadAllLines(path);
+            Console.WriteLine("Данные из файла:");
+            foreach (string line in lines)
+            {
+                Console.WriteLine($"{line}");
+            }
+            Console.Write("\n");
+        }
+
         public static double FindAvg(string path) 
         {
             string[] lines = File.ReadAllLines(path);
@@ -138,147 +129,114 @@ namespace lab_3
             return (maximum + minimum) / 2.0;
         }
 
-        //public static Toy[] ToyList()
-        //{
-        //    string[] toyNames = new string[]
-        //    {
-        //        "Кукла",
-        //        "Мишка плюшевый",
-        //        "Зайчик",
-        //        "Машинка",
-        //        "Грузовик",
-        //        "Самолёт",
-        //        "Ракета",
-        //        "Кораблик",
-        //        "Поезд",
-        //        "Робот",
-        //        "Конструктор",
-        //        "Кубики",
-        //        "Пазл",
-        //        "Мяч",
-        //        "Скакалка",
-        //        "Обруч",
-        //        "Санки",
-        //        "Самокат",
-        //        "Велосипед",
-        //        "Воздушный змей",
-        //        "Юла",
-        //        "Неваляшка",
-        //        "Матрёшка",
-        //        "Пирамидка",
-        //        "Солдатик",
-        //        "Динозавр",
-        //        "Тигр",
-        //        "Слон",
-        //        "Лошадка",
-        //        "Собачка",
-        //        "Кошка",
-        //        "Попугай",
-        //        "Рыбка",
-        //        "Черепаха",
-        //        "Пингвин",
-        //        "Лев",
-        //        "Жираф",
-        //        "Обезьянка",
-        //        "Крокодил",
-        //        "Ёжик",
-        //        "Клоун",
-        //        "Волчок",
-        //        "Калейдоскоп",
-        //        "Мозаика",
-        //        "Домино",
-        //        "Лото",
-        //        "Шахматы",
-        //        "Шашки",
-        //        "Нарды",
-        //        "Дартс",
-        //        "Кегли",
-        //        "Городки",
-        //        "Свисток",
-        //        "Барабан",
-        //        "Дудочка",
-        //        "Ксилофон",
-        //        "Гитара детская",
-        //        "Пианино детское",
-        //        "Металлофон",
-        //        "Набор доктора",
-        //        "Набор повара",
-        //        "Набор инструментов",
-        //        "Набор художника",
-        //        "Машинка пожарная",
-        //        "Машинка полицейская",
-        //        "Скорая помощь",
-        //        "Экскаватор",
-        //        "Бульдозер",
-        //        "Подъёмный кран",
-        //        "Трактор",
-        //        "Танк",
-        //        "Вертолёт",
-        //        "Подводная лодка",
-        //        "Лодка",
-        //        "Паром",
-        //        "Автобус",
-        //        "Трамвай",
-        //        "Метро",
-        //        "Самосвал",
-        //        "Бетономешалка",
-        //        "Мотоцикл",
-        //        "Квадрокоптер",
-        //        "Волшебная палочка",
-        //        "Кукольный домик",
-        //        "Коляска для кукол",
-        //        "Мебель для кукол",
-        //        "Посуда для кукол",
-        //        "Одежда для кукол",
-        //        "Мягкий кот",
-        //        "Мягкий пёс",
-        //        "Мягкий слон",
-        //        "Сова",
-        //        "Лиса",
-        //        "Ёжик лесной",
-        //        "Пингвинёнок",
-        //        "Тюлень",
-        //        "Дельфин",
-        //        "Кит",
-        //        "Дракон",
-        //        "Единорог",
-        //        "Фея",
-        //    };
-        //    Random rand = new Random();
-        //    int amount = 0;
-        //    Console.WriteLine("Введите количество чисел, которые требуется записать в файл");
-        //    while (!int.TryParse(Console.ReadLine(), out amount) || amount < 1)
-        //    {
-        //        Console.WriteLine("Неверный ввод. Попробуйте снова");
-        //    }
+        public static void MakeFile(string path) 
+        {
+            Random rand = new Random();
+            int amount_rows = rand.Next(1, 10);
+            int amount_ints = 0;
+            using (StreamWriter sw = new StreamWriter(path))
+            {
+                for (int i = 0; i < amount_rows; i++)
+                {
+                    amount_ints = rand.Next(1, 10);
+                    for (int j = 0; j < amount_ints; j++)
+                    {
+                        sw.Write($"{rand.Next(100).ToString()} ");
+                    }
+                    sw.Write("\n");
+                }
+                
+            }
+        }
 
-        //    Toy[] toys = new Toy[amount];
+        public static void CountMultiplication(string path)
+        {
+            string[] lines = File.ReadAllLines(path);
+            BigInteger multiplication = 1;
+            bool was_multiply = false;
+            foreach (string line in lines)
+            {
+                foreach (string symbol in line.Split(' ', StringSplitOptions.RemoveEmptyEntries))
+                {
+                    int number = 0;
+                    if (int.TryParse(symbol, out number) && number % 2 == 0 && number != 0)
+                    {
+                        was_multiply = true;
+                        multiplication *= number;
+                    }
+                }
+                
+            }
+            if (!was_multiply)
+            {
+                Console.WriteLine("Четных чисел не обнаружено");
+            }
+            else
+            {
+                Console.WriteLine($"Произведение четных чисел - {multiplication}");
+            }
+        }
 
-        //    for (int i = 0; i < amount; i++)
-        //    {
-        //        toys[i].Name = toyNames[rand.Next(toyNames.Length)];
-        //        toys[i].Price = rand.Next(10, 10000);
-        //        toys[i].minAge = rand.Next(0, 13);
-        //        toys[i].maxAge = rand.Next(toys[i].minAge, 20);
-        //    }
+        public static void ExcludeLatin(string path, string output_path)
+        {
+            string[] lines = File.ReadAllLines(path);
+            bool has_latin = false;
+            using (StreamWriter sw = new StreamWriter(output_path))
+            {
+                foreach (string line in lines)
+                {
+                    has_latin = false;
+                    foreach (char c in line)
+                    {
+                        if ((c >= 'a') && (c <= 'z') || (c >= 'A') && (c <= 'Z'))
+                        {
+                            has_latin = true;
+                            break;
+                        }
+                    }
+                    if (!has_latin)
+                    {
+                        sw.WriteLine(line);
+                    }
+                }
+            }
+        }
 
-        //    return toys;
-        //}
+        public static void FillToysFile(string path)
+        {
+            ToyList data = new ToyList
+            {
+                Items = new Toy[]
+                {
+                    new Toy { Name = "Плюшевый мишка", Price = 800m, MinAge = 1, MaxAge = 2 },
+                    new Toy { Name = "Кукла", Price = 1500m, MinAge = 3, MaxAge = 5 },
+                    new Toy { Name = "Машинка", Price = 400m, MinAge = 2, MaxAge = 10 },
+                    new Toy { Name = "Конструктор", Price = 2000m, MinAge = 5, MaxAge = 12 },
+                    new Toy { Name = "Мяч", Price = 500m, MinAge = 1, MaxAge = 10 },
+                    new Toy { Name = "Пирамидка", Price = 400m, MinAge = 1, MaxAge = 3 },
+                    new Toy { Name = "Кубики", Price = 700m, MinAge = 2, MaxAge = 4 },
+                    new Toy { Name = "Пазл 1000 дет.", Price = 800m, MinAge = 5, MaxAge = 13 },
+                    new Toy { Name = "Кролик плюшевый", Price = 1000m, MinAge = 2, MaxAge = 3 },
+                    new Toy { Name = "Пони", Price = 3000m, MinAge = 5, MaxAge = 10 },
+                }
 
-        //public static string ToXml(Toy[] toys)
-        //{
-        //    var ser = new XmlSerializer(typeof(Toy[]));
-        //    using var sw = new StringWriter();
-        //    ser.Serialize(sw, toys);
-        //    return sw.ToString();
-        //}
+            };
+            XmlSerializer serializer = new XmlSerializer(typeof(ToyList));
+            using (FileStream fs = new FileStream(path, FileMode.Create, FileAccess.Write))
+            {
+                serializer.Serialize(fs, data);
+            }
 
-        //public static Toy[] FromXml(string xml)
-        //{
-        //    var ser = new XmlSerializer(typeof(Toy[]));
-        //    using var sr = new StringReader(xml);
-        //    return (Toy[])ser.Deserialize(sr)!;
-        //}
+        }
+
+        public static void FindExpensive(string path)
+        {
+            XmlSerializer serializer = new XmlSerializer (typeof(ToyList));
+            using (FileStream fs = new FileStream(path, FileMode.Open, FileAccess.Read))
+            {
+                ToyList data = (ToyList)serializer.Deserialize(fs);
+            }
+        }
 
 
     }

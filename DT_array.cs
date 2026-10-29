@@ -72,7 +72,7 @@ namespace lab_3
                     {
                         while (element <= array[i - 1, j])
                         {
-                            element = rand.Next(100, 1000);
+                            element = rand.Next(100, i*1000);
                         }
                     }
                     array[i, j] = element;
@@ -322,6 +322,21 @@ namespace lab_3
                 Console.WriteLine("Невозможно выполнить вычитание.");
                 return null;
             }
+        }
+
+        public static DT_array operator *(int num, DT_array A)
+        {
+            int n = A.array.GetLength(0);
+            int m = A.array.GetLength(1);
+            DT_array C = new(n, m);
+            for (int i = 0; i < n; i++)
+            {
+                for (int j = 0; j < m; j++)
+                {
+                    C.array[i, j] *= num;
+                }
+            }
+            return C;
         }
     }
 }
