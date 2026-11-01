@@ -333,7 +333,7 @@ namespace lab_3
             {
                 for (int j = 0; j < m; j++)
                 {
-                    C.array[i, j] *= num;
+                    C.array[i, j] = A.array[i, j] * num;
                 }
             }
             return C;
