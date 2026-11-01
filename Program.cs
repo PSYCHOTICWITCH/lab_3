@@ -126,7 +126,16 @@ internal class Program
                     }
                 case 5: 
                     {
-                        Console.WriteLine("В разработке.");
+                        Console.WriteLine("Укажите название файла");
+                        string path = Console.ReadLine();
+                        while (string.IsNullOrWhiteSpace(path))
+                        {
+                            Console.WriteLine("Попробуйте снова");
+                            path = Console.ReadLine();
+                        }
+                        FileClass.FillToysFile(path);
+                        FileClass.ShowXml(path);
+                        FileClass.FindExpensive(path);
                         break;
                     }
                 case 6: 

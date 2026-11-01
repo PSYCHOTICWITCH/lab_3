@@ -229,15 +229,58 @@ namespace lab_3
 
         }
 
+        public static void ShowXml(string path)
+        {
+            Toy[] toys = null;
+            XmlSerializer serializer = new XmlSerializer(typeof(ToyList));
+            using (FileStream fs = new FileStream(path, FileMode.Open, FileAccess.Read))
+            {
+                ToyList data = (ToyList)serializer.Deserialize(fs);
+                toys = data.Items;
+            }
+            Console.WriteLine("\nВсе игрушки в файле:");
+            foreach (var t in toys)
+                Console.WriteLine("  " + t);
+        }
+
         public static void FindExpensive(string path)
         {
+            Toy[] toys = null;
             XmlSerializer serializer = new XmlSerializer (typeof(ToyList));
             using (FileStream fs = new FileStream(path, FileMode.Open, FileAccess.Read))
             {
                 ToyList data = (ToyList)serializer.Deserialize(fs);
+                toys = data.Items;
+            }
+
+            Toy expensive_toy = toys[0];
+            int max_price = 0;
+            bool toy_found = false;
+            foreach (var t in toys)
+            {
+                if (t.MinAge < 4)
+                {
+                    if (t.Price > max_price)
+                    {
+                        expensive_toy = t;
+                        toy_found = true;
+                    }
+                }             
+                    
+            }
+
+            Console.WriteLine("\nРезультат:");
+            if (!toy_found)
+            {
+                Console.WriteLine("Игрушек для детей до 4 лет не найдено.");
+            }
+            else
+            {
+                Console.WriteLine("Самая дорогая игрушка для детей до 4 лет:");
+                Console.WriteLine($"  {expensive_toy.Name} — {expensive_toy.Price} руб. " +
+                                  $"(возраст: {expensive_toy.MinAge}-{expensive_toy.MaxAge} лет)");
             }
         }
-
 
     }
 }
